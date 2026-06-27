@@ -28,6 +28,10 @@ class PotatoBot(commands.Bot):
 
     async def setup_hook(self) -> None:
         await self.tree.sync()
+        
+    async def on_message(self, message):
+        if str(bot.user.id) in message.content:
+            await message.add_reaction("❌")
 
 
 bot = PotatoBot()
