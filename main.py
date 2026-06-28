@@ -13,6 +13,7 @@ load_dotenv()
 
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 COMMAND_PREFIX = os.getenv("COMMAND_PREFIX", "!")
+LOGGER = logging.getLogger("discord.potato")
 
 
 class PotatoBot(commands.Bot):
@@ -51,7 +52,7 @@ async def on_ready() -> None:
     time = datetime.fromtimestamp(timestamp, tz=timezone.utc)
 
 
-    logging.info("Logged in as %s (ID: %s)", bot.user, bot.user.id)
+    LOGGER.info("Logged in as %s (ID: %s)", bot.user, bot.user.id)
     
     if not change_status.is_running():
         change_status.start()
@@ -83,17 +84,15 @@ async def hello(interaction: discord.Interaction) -> None:
 
 
 def main() -> None:
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
-    )
+    discord.utils.setup_logging(level=logging.INFO)
 
     if not DISCORD_TOKEN:
         raise RuntimeError(
             "Missing DISCORD_TOKEN. Copy .env.example to .env and add your bot token."
         )
 
-    bot.run(DISCORD_TOKEN)
+    bot.run(DISCORD_TOKEN, log_handler=None)
+
 
 
 if __name__ == "__main__":
