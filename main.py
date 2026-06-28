@@ -83,10 +83,7 @@ async def hello(interaction: discord.Interaction) -> None:
 
 
 def main() -> None:
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
-    )
+
 
     if not DISCORD_TOKEN:
         raise RuntimeError(
