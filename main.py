@@ -1,10 +1,12 @@
 import logging
+from checker import Checker
 import os
 from datetime import datetime, timezone
 import discord
 from discord.ext import commands
 import humanize
 from dotenv import load_dotenv
+import textwrap
 from discord.ext import tasks
 
 
@@ -34,6 +36,27 @@ class PotatoBot(commands.Bot):
         if str(bot.user.id) in message.content:
             await message.add_reaction("❌")
             await change_status(discord.Status.dnd)
+        elif message.author.id != bot.user.id:
+            checker = Checker()
+            corrections = checker.checkText(message.content)
+            desc = "```❌ "
+            for i, correction in enumerate(corrections):
+                location = " "
+                correctiondesc = ""
+                for _ in range(correction.offset):
+                    location = f"{location} "
+                for _ in range(correction.error_length):
+                    location = f"{location}^"
+                msg = textwrap.fill(correction.message, width=50)
+                correctiondesc = f"\"{message.content}\"\n{location}\n➡️ {msg}\n\n"
+                desc += correctiondesc.replace('\n', '\n❌ ')
+            desc += f"\n\"{message.content}\" 🥀 🔪 😭\n\"{checker.getCorrectedText(message.content)}\" 🌈 ❤️ 😀```"
+            embed = discord.Embed(
+                title=f"{message.author.name}, please check your sentence.",
+                description=desc,
+                color=16730186
+            )
+            await message.reply(embed=embed)
 
 
 bot = PotatoBot()
