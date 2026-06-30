@@ -38,6 +38,7 @@ class PotatoBot(commands.Bot):
             await change_status(discord.Status.dnd)
         elif message.author.id != bot.user.id:
             checker = Checker()
+            content = discord.utils.escape_markdown(message.content)
             corrections = checker.checkText(message.content)
             desc = "❌ "
             feedbacklen = 20
@@ -50,18 +51,18 @@ class PotatoBot(commands.Bot):
                 #     location = f"{location}^"
                 # msg = textwrap.fill(correction.message, width=50)
                 if correction.offset <= feedbacklen:
-                    msg = message.content
+                    msg = content
                     msg = msg[:correction.offset] + "__**" + msg[correction.offset:correction.offset + correction.error_length] + "**__" + msg[correction.offset + correction.error_length:]
                     msg = "\"" + msg[0:(min(correction.offset + feedbacklen, correction.offset + correction.error_length + feedbacklen))] + "\"..."
                 else:
-                    msg = message.content
+                    msg = content
                     msg = msg[:correction.offset] + "__**" + msg[correction.offset:correction.offset + correction.error_length] + "**__" + msg[correction.offset + correction.error_length:]
-                    msg = "...\"" + msg[int(correction.offset - (feedbacklen)):int(min(correction.offset + feedbacklen, correction.offset + correction.error_length + feedbacklen))] + "\"..."
+                    msg = "...\"" + msg[int(correction.offset - (feedbacklen)):int(min(correction.offset + feedbacklen + 1, correction.offset + correction.error_length + feedbacklen + 1))] + "\"..."
                 correctiondesc = f"{msg}\n➡️ {correction.message}\n\n"
                 desc += correctiondesc.replace('\n', '\n❌ ')
-            desc += f"\n\"{message.content}\" 🥀 🔪 😭\n\"{checker.getCorrectedText(message.content)}\" 🌈 ❤️ 😀"
+            desc += f"\n\"{content}\" 🥀 🔪 😭\n\"{checker.getCorrectedText(content)}\" 🌈 ❤️ 😀"
             embed = discord.Embed(
-                title=f"{message.author.name}, please check your sentence.",
+                title=f"{message.author.name}, please double-check your message before sending.",
                 description=desc,
                 color=16730186
             )
